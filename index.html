@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 1. SETUP --- */
+        /* --- STYLES --- */
         :root {
             --bg: #ffccd5;
             --envelope: #ff4d6d;
@@ -18,7 +18,6 @@
 
         body {
             background-color: var(--bg);
-            /* Cute subtle pattern */
             background-image: radial-gradient(#ff8fa3 1px, transparent 1px);
             background-size: 20px 20px;
             height: 100vh;
@@ -30,7 +29,6 @@
             font-family: 'Nunito', sans-serif;
         }
 
-        /* --- 2. THE WRAPPER (Holds everything) --- */
         .wrapper {
             position: relative;
             width: 300px;
@@ -39,11 +37,8 @@
             transition: transform 0.5s;
         }
 
-        .wrapper:hover {
-            transform: scale(1.05);
-        }
+        .wrapper:hover { transform: scale(1.05); }
 
-        /* --- 3. THE ENVELOPE SHELL --- */
         .envelope {
             position: relative;
             width: 100%;
@@ -54,107 +49,75 @@
             z-index: 10;
         }
 
-        /* The Triangular Flap (Top) */
         .lid {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 0;
+            top: 0; left: 0; width: 0; height: 0;
             border-left: 150px solid transparent;
             border-right: 150px solid transparent;
             border-top: 100px solid var(--envelope-dark);
             transform-origin: top;
             transition: transform 0.5s ease, z-index 0.2s;
-            z-index: 30; /* Starts on top */
+            z-index: 30;
         }
 
-        /* The Pocket (Front view) */
         .pocket {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 0;
+            bottom: 0; left: 0; width: 0; height: 0;
             border-left: 150px solid var(--envelope);
             border-right: 150px solid var(--envelope);
-            border-bottom: 100px solid var(--envelope-dark); /* Darker shade for depth */
+            border-bottom: 100px solid var(--envelope-dark);
             border-radius: 0 0 10px 10px;
             z-index: 20;
         }
 
-        /* --- 4. THE LETTER (Hidden Inside) --- */
         .letter {
             position: absolute;
-            top: 10px;
-            left: 15px;
-            width: 270px;
-            height: 180px;
+            top: 10px; left: 15px; width: 270px; height: 180px;
             background: var(--letter);
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             box-sizing: border-box;
             text-align: center;
-            transition: transform 0.6s ease 0.4s, z-index 0.2s; /* Slide up delay */
-            z-index: 5; /* Starts inside */
+            transition: transform 0.6s ease 0.4s, z-index 0.2s;
+            z-index: 5;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
 
-        /* --- 5. ANIMATION STATES (When Clicked) --- */
-        
-        /* Step 1: Open Lid */
-        .wrapper.open .lid {
-            transform: rotateX(180deg);
-            z-index: 1; /* Goes behind letter */
-        }
+        /* OPEN ANIMATION */
+        .wrapper.open .lid { transform: rotateX(180deg); z-index: 1; }
+        .wrapper.open .letter { transform: translateY(-150px); z-index: 25; }
 
-        /* Step 2: Letter Slides Up */
-        .wrapper.open .letter {
-            transform: translateY(-150px);
-            z-index: 25; /* Comes in front of pocket */
-        }
-
-        /* --- CONTENT STYLING --- */
         h1 {
             font-family: 'Dancing Script', cursive;
             color: var(--text);
             margin: 0;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
         }
 
         .status {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #ff4d6d;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 5px;
         }
 
         .countdown {
             display: flex;
-            justify-content: space-around;
-            margin-top: 10px;
+            justify-content: center;
+            gap: 10px; /* Space between numbers */
+            margin-top: 5px;
             border-top: 1px dashed #ff8fa3;
-            padding-top: 10px;
+            padding-top: 5px;
         }
         
-        .time-box span {
-            display: block;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--text);
-        }
-        
-        .time-box small {
-            font-size: 0.6rem;
-            color: #888;
-        }
+        .time-box { text-align: center; }
+        .time-box span { display: block; font-size: 1.1rem; font-weight: bold; color: var(--text); }
+        .time-box small { font-size: 0.6rem; color: #888; }
 
-        /* Floating Hint */
         .hint {
             position: absolute;
             bottom: -50px;
@@ -169,13 +132,11 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
         }
-
     </style>
 </head>
 <body>
 
     <div class="wrapper" onclick="toggleEnvelope()">
-        
         <div class="envelope">
             <div class="lid"></div>
             <div class="pocket"></div>
@@ -183,107 +144,89 @@
 
         <div class="letter">
             <div>
-                <div class="status" id="date-status">checking...</div>
+                <div class="status" id="date-status">Loading...</div>
                 <h1 id="main-msg">For You</h1>
             </div>
 
             <div class="countdown">
-                <div class="time-box">
-                    <span id="d">0</span><small>Days</small>
-                </div>
-                <div class="time-box">
-                    <span id="h">0</span><small>Hrs</small>
-                </div>
-                <div class="time-box">
-                    <span id="m">0</span><small>Min</small>
-                </div>
+                <div class="time-box"><span id="d">0</span><small>Days</small></div>
+                <div class="time-box"><span id="h">0</span><small>Hrs</small></div>
+                <div class="time-box"><span id="m">0</span><small>Min</small></div>
+                <div class="time-box"><span id="s">0</span><small>Sec</small></div>
             </div>
             
-            <div style="font-size: 0.7rem; color: #aaa; margin-top: 5px;">See you Feb 14 ❤️</div>
+            <div style="font-size: 0.7rem; color: #aaa; margin-top: 5px;">Feb 14 is coming! ❤️</div>
         </div>
 
         <div class="hint">👇 Tap to Open</div>
     </div>
 
     <script>
-    // --- ROBUST SETTINGS ---
-    const eventName = "Valentine's Day";
-    const targetDateString = "Feb 14, 2026 00:00:00"; // EXPLICIT DATE
+        // --- 1. SETTINGS ---
+        // Force the date to next Valentine's Day
+        const targetDate = new Date("Feb 14, 2026 00:00:00").getTime();
 
-    // --- DAY MESSAGES ---
-    const dailyMessages = {
-        7: "Rose Day 🌹",
-        8: "Propose Day 💍",
-        9: "Chocolate Day 🍫",
-        10: "Teddy Day 🧸",
-        11: "Promise Day 🤝",
-        12: "Hug Day 🫂",
-        13: "Kiss Day 💋",
-        14: "Valentine's Day ❤️"
-    };
+        const dayNames = {
+            7: "Rose Day 🌹",
+            8: "Propose Day 💍",
+            9: "Chocolate Day 🍫",
+            10: "Teddy Day 🧸",
+            11: "Promise Day 🤝",
+            12: "Hug Day 🫂",
+            13: "Kiss Day 💋",
+            14: "Valentine's Day ❤️"
+        };
 
-    function updateSystem() {
-        const now = new Date();
-        const currentDate = now.getDate();
-        const currentMonth = now.getMonth(); // 1 = Feb
+        function updateSystem() {
+            const now = new Date();
+            const today = now.getDate();
+            const month = now.getMonth(); // 1 = Feb
 
-        // 1. UPDATE MESSAGE (If elements exist)
-        const msgElement = document.getElementById('main-msg'); 
-        const statusElement = document.getElementById('date-status');
-        
-        if (msgElement && statusElement) {
-            if (currentMonth === 1 && dailyMessages[currentDate]) {
-                statusElement.innerText = "Today is:";
-                msgElement.innerText = dailyMessages[currentDate];
-            } else {
-                statusElement.innerText = "Counting Down To:";
-                msgElement.innerText = eventName;
-            }
-        }
+            // 1. UPDATE TEXT MESSAGE
+            const msgElement = document.getElementById('main-msg');
+            const statusElement = document.getElementById('date-status');
 
-        // 2. CALCULATE COUNTDOWN
-        const countDate = new Date(targetDateString).getTime();
-        const currentTime = now.getTime();
-        const gap = countDate - currentTime;
-
-        // 3. SAFE UPDATE (Prevents errors if IDs are wrong)
-        const d = Math.floor(gap / (1000 * 60 * 60 * 24));
-        const h = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((gap % (1000 * 60)) / 1000);
-
-        // Check if elements exist before updating to avoid console errors
-        if(document.getElementById('d')) document.getElementById('d').innerText = d > 0 ? d : 0;
-        if(document.getElementById('h')) document.getElementById('h').innerText = h > 0 ? h : 0;
-        if(document.getElementById('m')) document.getElementById('m').innerText = m > 0 ? m : 0;
-        if(document.getElementById('s')) document.getElementById('s').innerText = s > 0 ? s : 0; // If you added seconds
-
-        // 4. IF DATE PASSED
-        if (gap <= 0) {
-           const timerBox = document.querySelector('.countdown');
-           if(timerBox) timerBox.innerHTML = "<div style='color:#d90429; font-weight:bold;'>It's Today! ❤️</div>";
-        }
-    }
-
-    // Run immediately and then every second
-    updateSystem();
-    setInterval(updateSystem, 1000);
-    
-    // --- ENVELOPE CLICK HANDLER (Keep this) ---
-    function toggleEnvelope() {
-        const wrapper = document.querySelector('.wrapper');
-        if(wrapper) {
-            wrapper.classList.toggle('open');
-            const hint = document.querySelector('.hint');
-            if(hint) {
-                if(wrapper.classList.contains('open')) {
-                    hint.style.display = 'none';
+            if (msgElement && statusElement) {
+                if(month === 1 && dayNames[today]) {
+                    statusElement.innerText = "Today is:";
+                    msgElement.innerText = dayNames[today];
                 } else {
-                    setTimeout(() => hint.style.display = 'block', 1000);
+                    statusElement.innerText = "Countdown to:";
+                    msgElement.innerText = "Valentine's Day";
                 }
             }
+
+            // 2. CALCULATE TIME
+            const gap = targetDate - now.getTime();
+
+            const d = Math.floor(gap / (1000 * 60 * 60 * 24));
+            const h = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((gap % (1000 * 60)) / 1000);
+
+            // 3. UPDATE HTML (With Safety Checks)
+            if(document.getElementById('d')) document.getElementById('d').innerText = d;
+            if(document.getElementById('h')) document.getElementById('h').innerText = h;
+            if(document.getElementById('m')) document.getElementById('m').innerText = m;
+            if(document.getElementById('s')) document.getElementById('s').innerText = s;
         }
-    }
-</script>
+
+        // --- THE ENGINE (This makes it run continuously) ---
+        setInterval(updateSystem, 1000);
+        updateSystem(); // Run once immediately so we don't wait 1 second
+
+        // --- ENVELOPE LOGIC ---
+        function toggleEnvelope() {
+            const wrapper = document.querySelector('.wrapper');
+            wrapper.classList.toggle('open');
+            const hint = document.querySelector('.hint');
+            
+            if(wrapper.classList.contains('open')) {
+                hint.style.display = 'none';
+            } else {
+                setTimeout(() => hint.style.display = 'block', 1000);
+            }
+        }
+    </script>
 </body>
 </html>
