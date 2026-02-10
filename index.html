@@ -206,67 +206,84 @@
     </div>
 
     <script>
-        // --- 1. ENVELOPE INTERACTION ---
-        function toggleEnvelope() {
-            const wrapper = document.querySelector('.wrapper');
+    // --- ROBUST SETTINGS ---
+    const eventName = "Valentine's Day";
+    const targetDateString = "Feb 14, 2026 00:00:00"; // EXPLICIT DATE
+
+    // --- DAY MESSAGES ---
+    const dailyMessages = {
+        7: "Rose Day 🌹",
+        8: "Propose Day 💍",
+        9: "Chocolate Day 🍫",
+        10: "Teddy Day 🧸",
+        11: "Promise Day 🤝",
+        12: "Hug Day 🫂",
+        13: "Kiss Day 💋",
+        14: "Valentine's Day ❤️"
+    };
+
+    function updateSystem() {
+        const now = new Date();
+        const currentDate = now.getDate();
+        const currentMonth = now.getMonth(); // 1 = Feb
+
+        // 1. UPDATE MESSAGE (If elements exist)
+        const msgElement = document.getElementById('main-msg'); 
+        const statusElement = document.getElementById('date-status');
+        
+        if (msgElement && statusElement) {
+            if (currentMonth === 1 && dailyMessages[currentDate]) {
+                statusElement.innerText = "Today is:";
+                msgElement.innerText = dailyMessages[currentDate];
+            } else {
+                statusElement.innerText = "Counting Down To:";
+                msgElement.innerText = eventName;
+            }
+        }
+
+        // 2. CALCULATE COUNTDOWN
+        const countDate = new Date(targetDateString).getTime();
+        const currentTime = now.getTime();
+        const gap = countDate - currentTime;
+
+        // 3. SAFE UPDATE (Prevents errors if IDs are wrong)
+        const d = Math.floor(gap / (1000 * 60 * 60 * 24));
+        const h = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((gap % (1000 * 60)) / 1000);
+
+        // Check if elements exist before updating to avoid console errors
+        if(document.getElementById('d')) document.getElementById('d').innerText = d > 0 ? d : 0;
+        if(document.getElementById('h')) document.getElementById('h').innerText = h > 0 ? h : 0;
+        if(document.getElementById('m')) document.getElementById('m').innerText = m > 0 ? m : 0;
+        if(document.getElementById('s')) document.getElementById('s').innerText = s > 0 ? s : 0; // If you added seconds
+
+        // 4. IF DATE PASSED
+        if (gap <= 0) {
+           const timerBox = document.querySelector('.countdown');
+           if(timerBox) timerBox.innerHTML = "<div style='color:#d90429; font-weight:bold;'>It's Today! ❤️</div>";
+        }
+    }
+
+    // Run immediately and then every second
+    updateSystem();
+    setInterval(updateSystem, 1000);
+    
+    // --- ENVELOPE CLICK HANDLER (Keep this) ---
+    function toggleEnvelope() {
+        const wrapper = document.querySelector('.wrapper');
+        if(wrapper) {
             wrapper.classList.toggle('open');
-            
             const hint = document.querySelector('.hint');
-            if(wrapper.classList.contains('open')) {
-                hint.style.display = 'none';
-            } else {
-                setTimeout(() => hint.style.display = 'block', 1000);
+            if(hint) {
+                if(wrapper.classList.contains('open')) {
+                    hint.style.display = 'none';
+                } else {
+                    setTimeout(() => hint.style.display = 'block', 1000);
+                }
             }
         }
-
-        // --- 2. DATE LOGIC ---
-        const days = {
-            7: "Rose Day 🌹",
-            8: "Propose Day 💍",
-            9: "Chocolate Day 🍫",
-            10: "Teddy Day 🧸",
-            11: "Promise Day 🤝",
-            12: "Hug Day 🫂",
-            13: "Kiss Day 💋",
-            14: "Valentine's Day ❤️"
-        };
-
-        function updateData() {
-            const now = new Date();
-            const date = now.getDate();
-            const month = now.getMonth(); // 1 = Feb
-
-            // Update Text
-            if(month === 1 && days[date]) {
-                document.getElementById('date-status').innerText = "Today is:";
-                document.getElementById('main-msg').innerText = days[date];
-            } else {
-                document.getElementById('date-status').innerText = "Counting down to:";
-                document.getElementById('main-msg').innerText = "Valentine's";
-            }
-
-            // Update Timer
-            const target = new Date(now.getFullYear(), 1, 14).getTime();
-            // If passed, next year
-            if(now.getTime() > target + 86400000) target = new Date(now.getFullYear()+1, 1, 14).getTime();
-            
-            const diff = target - now.getTime();
-            
-            if (diff <= 0) {
-                 document.querySelector('.countdown').innerHTML = "<b>It's Today! 🎉</b>";
-            } else {
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-                document.getElementById('d').innerText = d;
-                document.getElementById('h').innerText = h;
-                document.getElementById('m').innerText = m;
-            }
-        }
-
-        setInterval(updateData, 1000);
-        updateData();
-    </script>
+    }
+</script>
 </body>
 </html>
