@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You've Got Mail 💌</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 1. SETUP --- */
+        :root {
+            --bg: #ffccd5;
+            --envelope: #ff4d6d;
+            --envelope-dark: #c9184a;
+            --letter: #fff0f3;
+            --text: #590d22;
+        }
+
+        body {
+            background-color: var(--bg);
+            /* Cute subtle pattern */
+            background-image: radial-gradient(#ff8fa3 1px, transparent 1px);
+            background-size: 20px 20px;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        /* --- 2. THE WRAPPER (Holds everything) --- */
+        .wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            cursor: pointer;
+            transition: transform 0.5s;
+        }
+
+        .wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- 3. THE ENVELOPE SHELL --- */
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--envelope);
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        /* The Triangular Flap (Top) */
+        .lid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid var(--envelope-dark);
+            transform-origin: top;
+            transition: transform 0.5s ease, z-index 0.2s;
+            z-index: 30; /* Starts on top */
+        }
+
+        /* The Pocket (Front view) */
+        .pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid var(--envelope);
+            border-right: 150px solid var(--envelope);
+            border-bottom: 100px solid var(--envelope-dark); /* Darker shade for depth */
+            border-radius: 0 0 10px 10px;
+            z-index: 20;
+        }
+
+        /* --- 4. THE LETTER (Hidden Inside) --- */
+        .letter {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            width: 270px;
+            height: 180px;
+            background: var(--letter);
+            border-radius: 10px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            transition: transform 0.6s ease 0.4s, z-index 0.2s; /* Slide up delay */
+            z-index: 5; /* Starts inside */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* --- 5. ANIMATION STATES (When Clicked) --- */
+        
+        /* Step 1: Open Lid */
+        .wrapper.open .lid {
+            transform: rotateX(180deg);
+            z-index: 1; /* Goes behind letter */
+        }
+
+        /* Step 2: Letter Slides Up */
+        .wrapper.open .letter {
+            transform: translateY(-150px);
+            z-index: 25; /* Comes in front of pocket */
+        }
+
+        /* --- CONTENT STYLING --- */
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            color: var(--text);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .status {
+            font-size: 0.9rem;
+            color: #ff4d6d;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            border-top: 1px dashed #ff8fa3;
+            padding-top: 10px;
+        }
+        
+        .time-box span {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text);
+        }
+        
+        .time-box small {
+            font-size: 0.6rem;
+            color: #888;
+        }
+
+        /* Floating Hint */
+        .hint {
+            position: absolute;
+            bottom: -50px;
+            width: 100%;
+            text-align: center;
+            color: var(--text);
+            font-weight: bold;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="wrapper" onclick="toggleEnvelope()">
+        
+        <div class="envelope">
+            <div class="lid"></div>
+            <div class="pocket"></div>
+        </div>
+
+        <div class="letter">
+            <div>
+                <div class="status" id="date-status">checking...</div>
+                <h1 id="main-msg">For You</h1>
+            </div>
+
+            <div class="countdown">
+                <div class="time-box">
+                    <span id="d">0</span><small>Days</small>
+                </div>
+                <div class="time-box">
+                    <span id="h">0</span><small>Hrs</small>
+                </div>
+                <div class="time-box">
+                    <span id="m">0</span><small>Min</small>
+                </div>
+            </div>
+            
+            <div style="font-size: 0.7rem; color: #aaa; margin-top: 5px;">See you Feb 14 ❤️</div>
+        </div>
+
+        <div class="hint">👇 Tap to Open</div>
+    </div>
+
+    <script>
+        // --- 1. ENVELOPE INTERACTION ---
+        function toggleEnvelope() {
+            const wrapper = document.querySelector('.wrapper');
+            wrapper.classList.toggle('open');
+            
+            const hint = document.querySelector('.hint');
+            if(wrapper.classList.contains('open')) {
+                hint.style.display = 'none';
+            } else {
+                setTimeout(() => hint.style.display = 'block', 1000);
+            }
+        }
+
+        // --- 2. DATE LOGIC ---
+        const days = {
+            7: "Rose Day 🌹",
+            8: "Propose Day 💍",
+            9: "Chocolate Day 🍫",
+            10: "Teddy Day 🧸",
+            11: "Promise Day 🤝",
+            12: "Hug Day 🫂",
+            13: "Kiss Day 💋",
+            14: "Valentine's Day ❤️"
+        };
+
+        function updateData() {
+            const now = new Date();
+            const date = now.getDate();
+            const month = now.getMonth(); // 1 = Feb
+
+            // Update Text
+            if(month === 1 && days[date]) {
+                document.getElementById('date-status').innerText = "Today is:";
+                document.getElementById('main-msg').innerText = days[date];
+            } else {
+                document.getElementById('date-status').innerText = "Counting down to:";
+                document.getElementById('main-msg').innerText = "Valentine's";
+            }
+
+            // Update Timer
+            const target = new Date(now.getFullYear(), 1, 14).getTime();
+            // If passed, next year
+            if(now.getTime() > target + 86400000) target = new Date(now.getFullYear()+1, 1, 14).getTime();
+            
+            const diff = target - now.getTime();
+            
+            if (diff <= 0) {
+                 document.querySelector('.countdown').innerHTML = "<b>It's Today! 🎉</b>";
+            } else {
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+                document.getElementById('d').innerText = d;
+                document.getElementById('h').innerText = h;
+                document.getElementById('m').innerText = m;
+            }
+        }
+
+        setInterval(updateData, 1000);
+        updateData();
+    </script>
+</body>
+</html>
